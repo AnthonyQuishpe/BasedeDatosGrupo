@@ -1,3 +1,9 @@
+#UNIVERSIDAD DE LAS FUERZAS ARMADAS ESPE
+#SISTEMA DE BASE DE DATOS
+#Integrantes:
+#           Limones John
+#           Quishpe Anthony
+
 # es una librería de Python especializada en el manejo y análisis de estructuras de datos.
 import pandas as pd
 import uuid  # define un sistema para crear identificadores universalmente únicos de recursos 
