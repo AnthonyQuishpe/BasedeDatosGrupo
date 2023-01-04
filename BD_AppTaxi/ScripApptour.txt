@@ -1,0 +1,143 @@
+CREATE TABLE provincia
+    ( provincia_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      provincia_nombre VARCHAR(20),
+      provincia_status VARCHAR(20)
+      );
+
+CREATE TABLE canton
+    ( canton_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      canton_nombre VARCHAR(20),
+      canton_status VARCHAR(20),
+      provincia_id INTEGER NOT NULL,
+      CONSTRAINT fk_pronvincia,
+      FOREIGN KEY (provincia_id) REFERENCES provincia(provincia_id)
+      );
+
+CREATE INDEX IFK_canton_provincia_id ON canton ( provincia_id );
+
+CREATE TABLE parroquia
+    ( parroquia_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      parroquia_nombre VARCHAR(20),
+      parroquia_status VARCHAR(20),
+      canton_id INTEGER NOT NULL,
+      CONSTRAINT fk_canton,
+      FOREIGN KEY (canton_id) REFERENCES canton(canton_id)
+      );
+
+CREATE INDEX IFK_parroquia_canton_id ON parroquia ( canton_id );
+
+CREATE TABLE calle_principal
+    ( calle_principal_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      calle_principal_nombre VARCHAR(20),
+      parroquia_id INTEGER NOT NULL,
+      CONSTRAINT fk_parroquia,
+      FOREIGN KEY (parroquia_id) REFERENCES parroquia(parroquia_id)
+      );
+
+CREATE INDEX IFK_calle_principal_parroquia_id ON calle_principal ( parroquia_id );
+
+CREATE TABLE coordenadas
+    ( coordenadas_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      coordenadas_latitud VARCHAR(20),
+      coordenadas_longitud VARCHAR(20),
+      calle_principal_id INTEGER NOT NULL,
+      CONSTRAINT fk_calle_principal,
+      FOREIGN KEY (calle_principal_id) REFERENCES calle_principal(calle_principal_id)
+      );      
+
+CREATE INDEX IFK_coordenadas_calle_principal_id ON coordenadas ( calle_principal_id );
+
+CREATE TABLE persona
+    ( persona_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      persona_nombre VARCHAR(20) NOT NULL,
+      persona_apellido VARCHAR(20) NOT NULL,
+      persona_email VARCHAR(60) NOT NULL,
+      persona_celular VARCHAR(60) NOT NULL,
+      direccion INTEGER,
+      CONSTRAINT fk_persona,
+      FOREIGN KEY (direccion) REFERENCES coordenadas(coordenadas_id)
+      );
+
+CREATE INDEX IFK_persona_coordenadas_id ON persona ( direccion );
+
+CREATE TABLE cliente
+    ( cliente_membresia INTEGER PRIMARY KEY AUTOINCREMENT,
+      persona_cliente_id INTEGER,
+      CONSTRAINT fk_cliente,
+      FOREIGN KEY (persona_cliente_id) REFERENCES persona(persona_id)
+      );
+
+CREATE INDEX IFK_cliente_persona_id ON cliente ( persona_cliente_id );
+
+CREATE TABLE conductor
+    ( conductor_licencia INTEGER PRIMARY KEY AUTOINCREMENT,
+      persona_conductor_id INTEGER NOT NULL,
+      CONSTRAINT fk_conductor,
+      FOREIGN KEY (persona_conductor_id) REFERENCES persona(persona_id)
+      );
+
+CREATE INDEX IFK_conductor_persona_id ON conductor ( persona_conductor_id );
+
+CREATE TABLE vehiculo
+    ( vehiculo_placa INTEGER PRIMARY KEY AUTOINCREMENT,
+      vehiculo_marca VARCHAR(20) NOT NULL,
+      vehiculo_color VARCHAR(20) NOT NULL,
+      persona_conductor_id INTEGER NOT NULL,
+      CONSTRAINT fk_vehiculo,
+      FOREIGN KEY (persona_conductor_id) REFERENCES conductor(persona_conductor_id )
+      );
+
+CREATE UNIQUE INDEX IFK_vehiculo_conductor_id ON vehiculo ( persona_conductor_id );
+
+
+CREATE TABLE pedido
+    ( persona_conductor_id INTEGER NOT NULL,
+      persona_cliente_id INTEGER NOT NULL,
+      servicio_id INTEGER NOT NULL,
+      pedido_precio REAL NOT NULL,
+      pedido_date DATETIME NOT NULL,
+      CONSTRAINT pk_pedido PRIMARY KEY (persona_conductor_id, persona_cliente_id, servicio_id),
+      FOREIGN KEY (persona_conductor_id) REFERENCES conductor(persona_conductor_id),
+      FOREIGN KEY (persona_cliente_id) REFERENCES cliente(persona_cliente_id),
+      FOREIGN KEY (servicio_id) REFERENCES servicio(servicio_id)
+      );
+
+CREATE TABLE servicio
+    ( servicio_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      servicio_nombre VARCHAR(20) NOT NULL,
+      destino_id INTEGER NOT NULL, 
+      CONSTRAINT fk_servicio,
+      FOREIGN KEY (destino_id) REFERENCES tarifa(destino_id)
+      );
+
+CREATE UNIQUE INDEX IFK_pedido_conductor_id ON pedido ( persona_conductor_id );
+
+CREATE INDEX IFK_pedido_cliente_id ON pedido ( persona_cliente_id );
+
+CREATE INDEX IFK_pedido_servicio_id ON pedido ( servicio_id );
+
+CREATE TABLE tarifa
+    ( destino_id INTEGER NOT NULL,
+      tarifa_forma_pago REAL NOT NULL,
+      tarifa_status VARCHAR(20) NOT NULL,
+      CONSTRAINT fk_tarifa PRIMARY KEY (destino_id),
+      FOREIGN KEY (destino_id) REFERENCES destino(destino_id)
+      );
+
+CREATE INDEX IFK_servicio_tarifa_id ON servicio ( destino_id );
+
+CREATE TABLE destino
+    ( destino_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      coordenadas_id INTEGER NOT NULL
+      );
+
+CREATE INDEX IFK_destino_tarifa_id ON tarifa ( destino_id );
+
+
+
+  
+
+
+ 
+
+      
